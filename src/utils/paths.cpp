@@ -76,8 +76,18 @@ std::filesystem::path Paths::getUserConfigFilePath() {
 
 std::filesystem::path Paths::getUserLockFilePath(
     const std::string &lockInstance) {
+    //added to fix case where instance is equal to ":0" as XDisplayString
+    //because ":" character is not permit on exFat filesystem for example
+    std::string lockInstanceFixed;
+    for (char c : lockInstance) {
+        if (c == ':') {
+            lockInstanceFixed += '-';
+        } else {
+            lockInstanceFixed += c;
+        }
+    }
   std::filesystem::path configPath = Paths::getUserConfigDirPath();
-  const std::string fileName = ".touchegg" + lockInstance + ".lock";
+  const std::string fileName = ".touchegg" + lockInstanceFixed + ".lock";
   return std::filesystem::path{configPath / fileName};
 }
 
